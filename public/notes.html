@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Your Notes</title>
+</head>
+<body>
+  <h2>Your Notes</h2>
+  <textarea id="notes" cols="30" rows="10"></textarea><br/>
+  <button onclick="saveNotes()">Save Notes</button>
+
+  <script>
+    const username = localStorage.getItem("username");
+
+    async function loadNotes() {
+      const res = await fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, pin: localStorage.getItem("pin") }),
+      });
+
+      const data = await res.json();
+      if (data.notes) {
+        document.getElementById("notes").value = data.notes.join("\n");
+      }
+    }
+
+    async function saveNotes() {
+      const notesText = document.getElementById("notes").value;
+      const notesArray = notesText.split("\n");
+
+      await fetch("/savenotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, notes: notesArray }),
+      });
+
+      alert("Notes saved!");
+    }
+
+    loadNotes();
+  </script>
+</body>
+</html>
+
